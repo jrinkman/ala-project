@@ -3,7 +3,9 @@ import Main from './Main';
 
 function App() {
   return (
-    <MantineProvider theme={{ fontFamily: 'Inter' }}>
+    <MantineProvider
+      theme={{ fontFamily: 'Inter', headings: { fontFamily: 'Inter' } }}
+    >
       <Main />
     </MantineProvider>
   );
