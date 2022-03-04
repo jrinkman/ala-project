@@ -8,7 +8,7 @@
 
 ## About
 
-This project was built using [Vite](https://vitejs.dev/) and [Preact](https://preactjs.com/).
+This project was built using [Vite](https://vitejs.dev/) and [React](https://reactjs.org/).
 
 ### Libraries Used
 
