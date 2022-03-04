@@ -1,17 +1,11 @@
-import { TextInput, Container } from '@mantine/core';
-
-// For HTTP requests
-// import axios from 'axios';
+import { MantineProvider } from '@mantine/core';
+import Main from './Main';
 
 function App() {
   return (
-    <Container>
-      <TextInput
-        placeholder="Species name, i.e. 'Fish'"
-        onChange={(ev) => console.log(ev)}
-      />
-      <span>testing</span>
-    </Container>
+    <MantineProvider theme={{ fontFamily: 'Inter' }}>
+      <Main />
+    </MantineProvider>
   );
 }
 

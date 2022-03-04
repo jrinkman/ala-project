@@ -12,7 +12,7 @@ This project was built using [Vite](https://vitejs.dev/) and [React](https://rea
 
 ### Libraries Used
 
-- [Mantine](https://mantine.dev/) - a frontend React components library
+- [Mantine](https://mantine.dev/) - a frontend React component library
 - [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/) - for code quality & style enforcement
 
 ## Prerequisites
