@@ -1,18 +1,28 @@
-import { Card, Group, Image, Text, Title } from '@mantine/core';
+import { Card, Group, Image, Skeleton, Title } from '@mantine/core';
 
 interface SpeciesCardProps {
-  species: Species;
+  species: Species | null;
 }
 
 function SpeciesCard({ species }: SpeciesCardProps) {
   // console.log(species);
   return (
-    <Card padding="md" shadow="sm" radius="md">
+    <Card shadow="sm" radius="md">
       <Card.Section>
-        <Group>
-          <Image src={species.imageUrl} height={100} width={80} />
-          <Group>
-            <Title order={3}>{species.name}</Title>
+        <Group align="flex-start">
+          <Skeleton height={90} width={70} visible={!species}>
+            <Image
+              src={species?.thumbnailUrl}
+              height={90}
+              width={70}
+              withPlaceholder
+            />
+          </Skeleton>
+          <Group style={{ paddingTop: 10, paddingBottom: 10 }}>
+            <Skeleton visible={!species}>
+              {/* Create a string of random length to add varation to the style */}
+              <Title order={4}>{species ? species.name : 'Testing Name'}</Title>
+            </Skeleton>
           </Group>
         </Group>
       </Card.Section>

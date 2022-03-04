@@ -23,6 +23,8 @@ function Main() {
           await axios.get<SearchResponse>(`search.json`)
         ).data;
 
+        console.log(searchResults);
+
         setSpeciesData(searchResults);
       } catch (error) {
         setError(error as Error);
@@ -52,14 +54,20 @@ function Main() {
           </Button>
         </Group>
       </Card>
-      {speciesData && (
+      {speciesData ? (
         <Grid>
-          {speciesData.results.map((species) => (
+          {speciesData.results.map((species: Species) => (
             <Grid.Col key={species.id} xs={12} sm={6} md={4} lg={3}>
               <SpeciesCard species={species} />
             </Grid.Col>
           ))}
         </Grid>
+      ) : (
+        Array.from(Array(15).keys()).map((key) => (
+          <Grid.Col key={key} xs={12} sm={6} md={4} lg={3}>
+            <SpeciesCard species={null} />
+          </Grid.Col>
+        ))
       )}
     </Container>
   );
