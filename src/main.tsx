@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { TextInput, Group, Button, Card, Container } from '@mantine/core';
+import { TextInput, Grid, Group, Button, Card, Container } from '@mantine/core';
 import { DownloadIcon } from '@radix-ui/react-icons';
 
 // For HTTP requests
 import axios from 'axios';
+
+import SpeciesCard from './components/SpeciesCard';
 
 function Main() {
   const [speciesData, setSpeciesData] = useState<SearchResults | null>(null);
@@ -31,7 +33,7 @@ function Main() {
   }, []);
 
   return (
-    <Container>
+    <Container size="xl">
       <Card shadow="lg" radius="lg">
         <Group spacing="sm">
           <TextInput
@@ -50,6 +52,15 @@ function Main() {
           </Button>
         </Group>
       </Card>
+      {speciesData && (
+        <Grid>
+          {speciesData.results.map((species) => (
+            <Grid.Col key={species.id} xs={12} sm={6} md={4} lg={3}>
+              <SpeciesCard species={species} />
+            </Grid.Col>
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 }

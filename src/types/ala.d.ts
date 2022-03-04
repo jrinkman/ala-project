@@ -1,4 +1,4 @@
-interface SearchItem {
+interface Species {
   id: string;
   guid: string;
   linkIdentifier: string;
@@ -50,7 +50,7 @@ interface SearchItem {
 interface SearchResults {
   totalRecords: number;
   facetResults: unknown[];
-  results: SearchItem[];
+  results: Species[];
 }
 
 interface SearchResponse {
