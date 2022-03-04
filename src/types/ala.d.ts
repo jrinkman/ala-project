@@ -1,4 +1,4 @@
-interface SearchAPIItem {
+interface SearchItem {
   id: string;
   guid: string;
   linkIdentifier: string;
@@ -47,8 +47,12 @@ interface SearchAPIItem {
   genusGuid: string;
 }
 
-interface SearchAPIResult {
+interface SearchResults {
   totalRecords: number;
   facetResults: unknown[];
-  results: SearchAPIItem[];
+  results: SearchItem[];
+}
+
+interface SearchResponse {
+  searchResults: SearchResults;
 }

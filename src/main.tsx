@@ -1,22 +1,29 @@
 import { useState, useEffect } from 'react';
 import { TextInput, Group, Button, Card, Container } from '@mantine/core';
+import { DownloadIcon } from '@radix-ui/react-icons';
 
 // For HTTP requests
 import axios from 'axios';
 
 function Main() {
-  const [results, setResults] = useState<SearchAPIResult | null>(null);
+  const [speciesData, setSpeciesData] = useState<SearchResults | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   // Listen for search changes <FIX>
   useEffect(() => {
     async function getSearchResults() {
       try {
-        const { data } = await axios.get<SearchAPIResult>(`search.json`);
-        setResults(data);
-        console.log(data);
+        // Reset the error state (in case we're making a new request after an error)
+        setError(null);
+
+        // Make a request to the ALA API
+        const { searchResults } = (
+          await axios.get<SearchResponse>(`search.json`)
+        ).data;
+
+        setSpeciesData(searchResults);
       } catch (error) {
-        console.log(error);
+        setError(error as Error);
       }
     }
 
@@ -33,14 +40,16 @@ function Main() {
             onChange={(ev) => console.log(ev)}
             radius="md"
           />
-          {results && (
-            <Button radius="md" variant="light">
-              Download as CSV
-            </Button>
-          )}
+          <Button
+            disabled={!speciesData || speciesData.results.length === 0}
+            radius="md"
+            variant="light"
+            leftIcon={<DownloadIcon />}
+          >
+            CSV
+          </Button>
         </Group>
       </Card>
-      <span>testing</span>
     </Container>
   );
 }
