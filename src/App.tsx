@@ -1,12 +1,12 @@
 import { MantineProvider } from '@mantine/core';
-import Main from './Main';
+import Search from './Search';
 
 function App() {
   return (
     <MantineProvider
       theme={{ fontFamily: 'Inter', headings: { fontFamily: 'Inter' } }}
     >
-      <Main />
+      <Search />
     </MantineProvider>
   );
 }

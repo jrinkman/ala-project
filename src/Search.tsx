@@ -19,7 +19,7 @@ import axios, { AxiosError } from 'axios';
 import SpeciesCard from './components/SpeciesCard';
 import Message from './components/Message';
 
-function Main() {
+function Search() {
   const [speciesData, setSpeciesData] = useState<SearchResults | null>(null);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -154,4 +154,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default Search;
