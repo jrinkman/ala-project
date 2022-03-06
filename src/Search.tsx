@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   TextInput,
   ScrollArea,
@@ -21,55 +21,94 @@ import axios, { AxiosError } from 'axios';
 import SpeciesCard from './components/SpeciesCard';
 import Message from './components/Message';
 
+// Helper function for removing author name commas
+const stripAuthor = (name: string | null) =>
+  name ? name.replaceAll(',', '') : 'N/A';
+
 function Search() {
   const [speciesData, setSpeciesData] = useState<SearchResults | null>(null);
+  const [firstHundred, setFirstHundred] = useState<SearchResults | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Store a reference to the search input box
+  // Store a reference to the search input box & hidden CSV download button
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
-  // Callback funciton for searching the API
-  const getSearchResults = useCallback(async () => {
-    // Ensure the search box has an input value
-    if (!searchInputRef.current || searchInputRef.current.value.length < 1)
-      return;
+  const getSearchResults = useCallback(
+    async (start?: number) => {
+      // Ensure the search box has an input value
+      if (!searchInputRef.current || searchInputRef.current.value.length < 1)
+        return;
 
-    try {
-      // Reset the error state (in case we're making a new request after an error)
-      setError(null);
-      setIsSearching(true);
+      // If we haven't clicked a pagination button, select the first option again
+      // (start is only supplied upon clicking a pagination button)
+      if (!start) setCurrentPage(1);
 
-      // Make a request to the ALA API
-      const { searchResults } = (
-        await axios.get<SearchResponse>(
-          `search.json?q=${
-            searchInputRef.current.value
-          }&pageSize=100&recordOffset=${currentPage - 1}`
-        )
-      ).data;
+      try {
+        // Reset the error state (in case we're making a new request after an error)
+        setError(null);
+        setIsSearching(true);
 
-      setIsSearching(false);
-      setSpeciesData(searchResults);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setError(`Network Error: ${(error as AxiosError).message}`);
-      } else setError((error as Error).message);
+        const queryUrl = `search.json?q=${
+          searchInputRef.current.value
+        }&pageSize=100&start=${((start || 1) - 1) * 100}&fq=idxtype:TAXON`;
 
-      // Disable the searching flag
-      setIsSearching(false);
-    }
-  }, [searchInputRef, isSearching]);
+        const { searchResults } = (await axios.get<SearchResponse>(queryUrl))
+          .data;
+
+        // If we're retrieving the first hundred results (i.e. we're on page 1), store them
+        if (start === 1 || currentPage === 1) setFirstHundred(searchResults);
+
+        setIsSearching(false);
+        setSpeciesData(searchResults);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(`Network Error: ${(error as AxiosError).message}`);
+        } else setError((error as Error).message);
+        setIsSearching(false);
+      }
+    },
+    [searchInputRef, isSearching, currentPage]
+  );
 
   // Callback function for downloading the results as a CSV
-  const exportResultsCSV = useCallback(() => {
-    if (!isExporting) {
+  const exportResultsCSV = useCallback(async () => {
+    if (!isExporting && firstHundred) {
       setIsExporting(true);
+
+      // Generate an encoded CSV string with the first 100 species
+      const csvString =
+        'data:text/csv;charset=utf-8,' +
+        'id,guid,kingdom,kingdomGuid,scientificName,author,imageUrl\n' +
+        firstHundred.results
+          .map(
+            (species) =>
+              `${species.id},` +
+              `${species.guid},` +
+              `${species.kingdom},` +
+              `${species.kingdomGuid},` +
+              `${species.scientificName},` +
+              `${stripAuthor(species.author)},` +
+              (species.imageUrl || 'N/A')
+          )
+          .join('\n');
+
+      // Simulate a download with the hidden anchor
+      if (downloadLinkRef.current && searchInputRef.current) {
+        downloadLinkRef.current.setAttribute('href', csvString);
+        downloadLinkRef.current.setAttribute(
+          'download',
+          `${searchInputRef.current.value} (${new Date().toLocaleString()}).csv`
+        );
+        downloadLinkRef.current.click();
+      }
+
       setIsExporting(false);
     }
-  }, [speciesData, isExporting]);
+  }, [firstHundred, isExporting]);
 
   return (
     <Container
@@ -82,6 +121,7 @@ function Search() {
         paddingTop: 15,
       }}
     >
+      <a style={{ display: 'none' }} ref={downloadLinkRef}></a>
       <Card shadow="md" radius="lg" style={{ overflow: 'visible' }}>
         <Grid>
           <Grid.Col xs={12} sm={10} md={10} lg={10} xl={11}>
@@ -102,7 +142,7 @@ function Search() {
                 color="blue"
                 size="lg"
                 radius="md"
-                onClick={getSearchResults}
+                onClick={() => getSearchResults()}
               >
                 <MagnifyingGlassIcon />
               </ActionIcon>
@@ -111,7 +151,12 @@ function Search() {
           <Grid.Col xs={12} sm={2} md={2} lg={2} xl={1}>
             <Button
               loading={isExporting}
-              disabled={Boolean(error) || !speciesData || isSearching}
+              disabled={
+                Boolean(error) ||
+                !firstHundred ||
+                firstHundred.results.length === 0 ||
+                isSearching
+              }
               radius="md"
               variant="light"
               leftIcon={<DownloadIcon />}
@@ -172,12 +217,12 @@ function Search() {
         }
       })()}
       {speciesData && speciesData.results.length > 0 && (
-        <Center style={{ paddingTop: 30, paddingBottom: 30 }}>
+        <Center style={{ paddingTop: 25, paddingBottom: 25 }}>
           <Pagination
             page={currentPage}
             onChange={(newPage) => {
               setCurrentPage(newPage);
-              getSearchResults();
+              getSearchResults(newPage);
             }}
             radius="md"
             total={Math.floor(speciesData.totalRecords / 100) + 1}
