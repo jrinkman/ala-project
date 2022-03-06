@@ -10,18 +10,18 @@ function SpeciesCard({ species }: SpeciesCardProps) {
     <Card shadow="sm" radius="md">
       <Card.Section>
         <Group align="flex-start">
-          <Skeleton height={110} width={70} visible={!species}>
+          <Skeleton height={120} width={80} visible={!species}>
             <Image
               src={species?.thumbnailUrl}
-              height={110}
-              width={70}
+              height={120}
+              width={80}
               withPlaceholder
             />
           </Skeleton>
           <Box style={{ paddingTop: 10, maxWidth: 190 }}>
             <Skeleton visible={!species}>
               {/* Create a string of random length to add varation to the style */}
-              <Text weight={700}>
+              <Text weight={700} style={{ maxHeight: 50 }}>
                 {species ? species.scientificName : 'Scientific Name'}
               </Text>
             </Skeleton>
