@@ -21,7 +21,7 @@ import axios, { AxiosError } from 'axios';
 import SpeciesCard from './components/SpeciesCard';
 import Message from './components/Message';
 
-// Helper function for removing author name commas
+// Helper function for removing author name commas (which mess up the CSV formatting)
 const stripAuthor = (name: string | null) =>
   name ? name.replaceAll(',', '') : 'N/A';
 
@@ -33,18 +33,18 @@ function Search() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Store a reference to the search input box & hidden CSV download button
+  // Store a reference to the search input box rather than storing the state
+  // in a state variable - requires less page re-renders
   const searchInputRef = useRef<HTMLInputElement>(null);
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   const getSearchResults = useCallback(
     async (start?: number) => {
-      // Ensure the search box has an input value
       if (!searchInputRef.current || searchInputRef.current.value.length < 1)
         return;
 
       // If we haven't clicked a pagination button, select the first option again
-      // (start is only supplied upon clicking a pagination button)
+      // (the 'start' parameter is only supplied upon clicking a pagination button)
       if (!start) setCurrentPage(1);
 
       try {
@@ -96,7 +96,7 @@ function Search() {
           )
           .join('\n');
 
-      // Simulate a download with the hidden anchor
+      // Simulate a download by clicking the hidden anchor
       if (downloadLinkRef.current && searchInputRef.current) {
         downloadLinkRef.current.setAttribute('href', csvString);
         downloadLinkRef.current.setAttribute(
