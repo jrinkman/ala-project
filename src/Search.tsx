@@ -4,13 +4,11 @@ import {
   ScrollArea,
   Grid,
   Group,
-  Text,
   Button,
   Card,
   Center,
   Container,
   Pagination,
-  Title,
   ActionIcon,
 } from '@mantine/core';
 import { DownloadIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
@@ -30,7 +28,6 @@ function Search() {
   const [firstHundred, setFirstHundred] = useState<SearchResults | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Store a reference to the search input box rather than storing the state
@@ -48,7 +45,7 @@ function Search() {
       if (!start) setCurrentPage(1);
 
       try {
-        // Reset the error state (in case we're making a new request after an error)
+        // Reset the search & error state (in case we're making a new request after an error)
         setError(null);
         setIsSearching(true);
 
@@ -60,7 +57,9 @@ function Search() {
           .data;
 
         // If we're retrieving the first hundred results (i.e. we're on page 1), store them
-        if (start === 1 || currentPage === 1) setFirstHundred(searchResults);
+        if (!start || start === 1) {
+          setFirstHundred(searchResults);
+        }
 
         setIsSearching(false);
         setSpeciesData(searchResults);
@@ -76,9 +75,7 @@ function Search() {
 
   // Callback function for downloading the results as a CSV
   const exportResultsCSV = useCallback(async () => {
-    if (!isExporting && firstHundred) {
-      setIsExporting(true);
-
+    if (firstHundred) {
       // Generate an encoded CSV string with the first 100 species
       const csvString =
         'data:text/csv;charset=utf-8,' +
@@ -105,10 +102,8 @@ function Search() {
         );
         downloadLinkRef.current.click();
       }
-
-      setIsExporting(false);
     }
-  }, [firstHundred, isExporting]);
+  }, [firstHundred]);
 
   return (
     <Container
@@ -150,7 +145,6 @@ function Search() {
           </Grid.Col>
           <Grid.Col xs={12} sm={2} md={2} lg={2} xl={1}>
             <Button
-              loading={isExporting}
               disabled={
                 Boolean(error) ||
                 !firstHundred ||
@@ -170,18 +164,13 @@ function Search() {
       </Card>
       {(() => {
         if (error) {
-          return (
-            <Center>
-              <Title>An error occured.</Title>
-              <Text>{error}</Text>
-            </Center>
-          );
+          return <Message title="An error occured." content={error} />;
         } else if (isSearching) {
           // If an API request is in progress
           return (
             <ScrollArea offsetScrollbars style={{ flexGrow: 1, marginTop: 35 }}>
               <Grid>
-                {Array.from(Array(15).keys()).map((key) => (
+                {Array.from(Array(25).keys()).map((key) => (
                   <Grid.Col key={key} xs={12} sm={6} md={4} lg={3}>
                     <SpeciesCard species={null} />
                   </Grid.Col>
@@ -216,7 +205,7 @@ function Search() {
           );
         }
       })()}
-      {speciesData && speciesData.results.length > 0 && (
+      {speciesData && speciesData.results.length > 0 && !error && (
         <Center style={{ paddingTop: 25, paddingBottom: 25 }}>
           <Pagination
             page={currentPage}
