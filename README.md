@@ -15,7 +15,7 @@
 The scope of the project is a simple web interface which interacts with the ALA Search API. As such, I decided a to develop client-side React application, for the following reasons:
 
 - The data on the web page changes frequently (i.e. different species are displayed for each search query).
-- The built static website files can easily be hosted via a CDN / edge network, to the benefit of the user (faster load times / less latency). I've used [Cloudflare Pages](https://pages.cloudflare.com/).
+- The built static website files can easily be hosted via a CDN / edge network, to the benefit of the user (faster load times / less latency). I've used [Netlify](https://netlify.com).
 - Less resources are needed to host (a server application does not need to be deployed, only the static files).
 
 See commented code for more context regarding design decisions.
