@@ -5,7 +5,6 @@ interface SpeciesCardProps {
 }
 
 function SpeciesCard({ species }: SpeciesCardProps) {
-  // console.log(species);
   return (
     <Card shadow="sm" radius="md">
       <Card.Section>
@@ -20,13 +19,11 @@ function SpeciesCard({ species }: SpeciesCardProps) {
           </Skeleton>
           <Box style={{ paddingTop: 10, maxWidth: 190 }}>
             <Skeleton visible={!species}>
-              {/* Create a string of random length to add varation to the style */}
               <Text weight={700} style={{ maxHeight: 50 }}>
                 {species ? species.scientificName : 'Scientific Name'}
               </Text>
             </Skeleton>
             <Skeleton visible={!species} style={{ marginTop: 5 }}>
-              {/* Create a string of random length to add varation to the style */}
               <Text size="sm" color="dimmed">
                 {species && species.commonName
                   ? species.commonName.split(', ')[0]
