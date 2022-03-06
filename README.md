@@ -8,6 +8,8 @@
   - [Prerequisites](#prerequisites)
   - [Running](#running)
 
+A live build of this app can be accessed **[here](https://brave-golick-4599a2.netlify.app/)**
+
 ## Design
 
 ### Why a CSR React app?

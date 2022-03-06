@@ -118,9 +118,9 @@ function Search() {
     >
       <a style={{ display: 'none' }} ref={downloadLinkRef}></a>
       <Card shadow="md" radius="lg" style={{ overflow: 'visible' }}>
-        <Grid>
+        <Grid gutter="xs">
           <Grid.Col xs={12} sm={10} md={10} lg={10} xl={11}>
-            <Group>
+            <Group spacing="xs">
               <TextInput
                 ref={searchInputRef}
                 icon={<MagnifyingGlassIcon />}
